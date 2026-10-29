@@ -54,8 +54,82 @@ app.get("/api/news", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(
-        `GoalHub news server running at http://localhost:${PORT}`
-    );
+// Zafronix Cup Fixtures
+const ZAFRONIX_API_KEY = process.env.ZAFRONIX_API_KEY;
+
+async function getCupFixtures(cup, season) {
+    const allowedCups = {
+        carabao: "carabaocup",
+        fa: "facup"
+    };
+
+    const competition = allowedCups[cup];
+
+    if (!competition) {
+        throw new Error("Unknown cup competition");
+    }
+
+    if (!ZAFRONIX_API_KEY) {
+        throw new Error("Zafronix API key is not configured");
+    }
+
+    const url =
+        `https://api.zafronix.com/england/${competition}/v1/matches` +
+        `?season=${encodeURIComponent(season)}`;
+
+    const response = await fetch(url, {
+        headers: {
+            "X-API-Key": ZAFRONIX_API_KEY
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(
+            `Zafronix returned HTTP ${response.status}`
+        );
+    }
+
+    return await response.json();
+}
+
+// Carabao Cup fixtures
+app.get("/api/carabao-cup", async (req, res) => {
+    try {
+        const season = req.query.season || "2026";
+        const data = await getCupFixtures("carabao", season);
+
+        res.json({
+            status: "ok",
+            competition: "Carabao Cup",
+            ...data
+        });
+    } catch (error) {
+        console.error("Carabao Cup error:", error.message);
+
+        res.status(502).json({
+            status: "error",
+            message: "Unable to load Carabao Cup fixtures."
+        });
+    }
+});
+
+// FA Cup fixtures
+app.get("/api/fa-cup", async (req, res) => {
+    try {
+        const season = req.query.season || "2026";
+        const data = await getCupFixtures("fa", season);
+
+        res.json({
+            status: "ok",
+            competition: "FA Cup",
+            ...data
+        });
+    } catch (error) {
+        console.error("FA Cup error:", error.message);
+
+        res.status(502).json({
+            status: "error",
+            message: "Unable to load FA Cup fixtures."
+        });
+    }
 });
