@@ -133,7 +133,30 @@ app.get("/api/fa-cup", async (req, res) => {
         });
     }
 });
+// Check available Carabao Cup seasons
+app.get("/api/carabao-seasons", async (req, res) => {
+    try {
+        const response = await fetch(
+            "https://api.zafronix.com/england/carabaocup/v1/seasons",
+            {
+                headers: {
+                    "X-API-Key": ZAFRONIX_API_KEY
+                }
+            }
+        );
 
+        const data = await response.json();
+
+        res.status(response.status).json(data);
+    } catch (error) {
+        console.error("Carabao seasons error:", error.message);
+
+        res.status(502).json({
+            status: "error",
+            message: "Unable to check available seasons."
+        });
+    }
+});
 app.listen(PORT, () => {
 console.log(
 "GoalHub news server running at http://localhost:${PORT}"
