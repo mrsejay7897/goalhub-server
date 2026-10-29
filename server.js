@@ -2,7 +2,11 @@ const express = require("express");
 const Parser = require("rss-parser");
 
 const app = express();
-const parser = new Parser();
+const parser = new Parser({
+    customFields: {
+        item: ["media:thumbnail", "media:content"]
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 const BBC_FEED = "https://feeds.bbci.co.uk/sport/football/rss.xml";
