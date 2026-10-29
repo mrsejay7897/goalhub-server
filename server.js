@@ -133,3 +133,9 @@ app.get("/api/fa-cup", async (req, res) => {
         });
     }
 });
+
+app.listen(PORT, () => {
+console.log(
+"GoalHub news server running at http://localhost:${PORT}"
+);
+});
