@@ -252,12 +252,10 @@ app.get("/api/head-to-head", async (req, res) => {
             throw new Error(`SportScore HTTP ${response.status}`);
         }
 
-        const data = await response.json();
-        const fixtures = Array.isArray(data.fixtures)
-            ? data.fixtures
-            : Array.isArray(data.data)
-                ? data.data
-                : [];
+       const data = await response.json();
+const fixtures = Array.isArray(data.matches)
+    ? data.matches
+    : [];
 
         h2hFixtureCache.set(date, {
             timestamp: Date.now(),
